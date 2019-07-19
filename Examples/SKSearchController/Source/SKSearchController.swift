@@ -118,6 +118,9 @@ public class SKSearchController: UISearchController {
                let icon = iconView.image {
                     iconView.image = icon.withRenderingMode(.alwaysTemplate)
                     iconView.tintColor = color
+                    if #available(iOS 13.0, *) { // iOS 13 需要设置大小, 不然会偏大
+                        iconView.frame.size = CGSize(width: 24, height: 24)
+                    }
             }
 
         }
@@ -197,8 +200,6 @@ public class SKSearchController: UISearchController {
                 findNavigationBarBottomLine(from: bar)?.isHidden = true
             }
         }
-        
-        
     }
     private func findNavigationBarBottomLine(from view: UIView) -> UIImageView? {
         if (view is UIImageView) && view.frame.size.height <= 1.0 {
@@ -262,30 +263,40 @@ public class SKSearchController: UISearchController {
     private func setupCancelButton(searchBar: UISearchBar) {
         if showCancelButtonWhileEditing {
             searchBar.setShowsCancelButton(true, animated: true)
-            for view in searchBar.subviews[0].subviews {
-                if view is UIButton {
-                    let button = view as! UIButton
-                    if let handler = customizeCancelButton {
-                        handler(button)
-                    } else {
-                        if let attributedTitle = cancelButtonAttributedTitle {
-                            allControlState() {
-                                button.setAttributedTitle(attributedTitle, for: $0)
-                            }
-                        } else {
-                            if let title = cancelButtonTitle { allControlState() {
-                                button.setTitle(title, for: $0)
-                                } }
-                            if let color = cancelButtonColor { allControlState() {
-                                button.setTitleColor(color, for: $0)
-                                } }
-                        }
+            if #available(iOS 13.0, *) {
+                if let button = searchBar.value(forKey: "cancelButton") as? UIButton {
+                    setCancelBtn(button: button)
+                }
+            } else {
+                for view in searchBar.subviews[0].subviews {
+                    if view is UIButton {
+                        let button = view as! UIButton
+                        setCancelBtn(button: button)
+                        break
                     }
-                    break
                 }
             }
         } else {
             searchBar.setShowsCancelButton(false, animated: false)
+        }
+    }
+    
+    private func setCancelBtn(button: UIButton) {
+        if let handler = customizeCancelButton {
+            handler(button)
+        } else {
+            if let attributedTitle = cancelButtonAttributedTitle {
+                allControlState() {
+                    button.setAttributedTitle(attributedTitle, for: $0)
+                }
+            } else {
+                if let title = cancelButtonTitle { allControlState() {
+                    button.setTitle(title, for: $0)
+                    } }
+                if let color = cancelButtonColor { allControlState() {
+                    button.setTitleColor(color, for: $0)
+                    } }
+            }
         }
     }
     

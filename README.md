@@ -6,6 +6,12 @@
 
 A Wrap for UISearchController makes all customization super easy.
 
+## Update For iOS 13
+> iOS 13 update for
+
+- **left icon size** set to 24x24 px
+- **cancel buttun** iOS 13 can't get cancel button by 'searchBar.subviews'
+
 ## Demo
 Dwonload and check out the demo project. 
 
